@@ -12,11 +12,15 @@ import { TourList } from "./pages/admin/TourList";
 import { TourEditor } from "./pages/admin/TourEditor";
 import { TourRates } from "./pages/admin/TourRates";
 import { TourSchedules } from "./pages/admin/TourSchedules";
+import { AdminReservations } from "./pages/admin/AdminReservations";
+import { AdminTestimonials } from "./pages/admin/AdminTestimonials";
+import { RouteError } from "./components/ErrorBoundary";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Root,
+    ErrorBoundary: RouteError,
     children: [
       { index: true, Component: Home },
       { path: "tours", Component: TourListing },
@@ -32,6 +36,7 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     Component: AdminLayout,
+    ErrorBoundary: RouteError,
     children: [
       { index: true, Component: AdminDashboard },
       { path: "tours", Component: TourList },
@@ -39,6 +44,8 @@ export const router = createBrowserRouter([
       { path: "tours/:id/edit", Component: TourEditor },
       { path: "tours/:id/rates", Component: TourRates },
       { path: "tours/:id/schedules", Component: TourSchedules },
+      { path: "reservas", Component: AdminReservations },
+      { path: "testimonios", Component: AdminTestimonials },
     ],
   },
 ]);

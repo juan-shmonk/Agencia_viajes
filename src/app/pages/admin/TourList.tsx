@@ -35,7 +35,7 @@ import {
 
 export function TourList() {
   const navigate = useNavigate()
-  const [categoryFilter, setCategoryFilter] = useState<string>('')
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [tourToDeactivate, setTourToDeactivate] = useState<TourListItem | null>(null)
 
@@ -43,7 +43,7 @@ export function TourList() {
     statusFilter === 'active' ? true : statusFilter === 'inactive' ? false : undefined
 
   const { data: tours, loading, error, reload } = useTours({
-    category_id: categoryFilter || undefined,
+    category_id: categoryFilter === 'all' ? undefined : categoryFilter,
     active: activeFilter,
   })
 
@@ -94,7 +94,7 @@ export function TourList() {
             <SelectValue placeholder="Categoría" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todas las categorías</SelectItem>
+            <SelectItem value="all">Todas las categorías</SelectItem>
             {categories.map(cat => (
               <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
             ))}
