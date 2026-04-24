@@ -8,6 +8,8 @@ import { Success } from "./pages/Success";
 import { AdminLogin } from "./pages/AdminLogin";
 import { AdminLayout } from "./pages/admin/AdminLayout";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
+import { TourList } from "./pages/admin/TourList";
+import { TourEditor } from "./pages/admin/TourEditor";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +32,9 @@ export const router = createBrowserRouter([
     Component: AdminLayout,
     children: [
       { index: true, Component: AdminDashboard },
+      { path: "tours", Component: TourList },
+      { path: "tours/new", Component: TourEditor },
+      { path: "tours/:id/edit", Component: TourEditor },
     ],
   },
 ]);
