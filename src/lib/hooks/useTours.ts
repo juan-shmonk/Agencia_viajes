@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../supabase'
-import type { Tour, TourItineraryDay, Category } from '../database.types'
+import type { Tour, TourItineraryDay, TourRate, Category } from '../database.types'
 
 export interface TourListItem extends Tour {
   categories: Pick<Category, 'id' | 'name' | 'slug'> | null
+  tour_rates: Pick<TourRate, 'id' | 'name' | 'price' | 'active' | 'currency'>[]
 }
 
 export interface TourWithRelations extends Tour {
   categories: Pick<Category, 'id' | 'name' | 'slug'> | null
   tour_itinerary: TourItineraryDay[]
+  tour_rates: TourRate[]
 }
 
 export type TourInsert = Omit<Tour, 'id' | 'created_at' | 'updated_at' | 'rating' | 'reviews_count'>
@@ -39,7 +41,7 @@ export function useTours(filter?: ToursFilter) {
       try {
         let query = supabase
           .from('tours')
-          .select('*, categories(id, name, slug)')
+          .select('*, categories(id, name, slug), tour_rates(id, name, price, active, currency)')
           .order('created_at', { ascending: false })
 
         if (filterActive !== undefined) query = query.eq('active', filterActive)
@@ -78,7 +80,7 @@ export function useTour(id: string | undefined) {
 
     supabase
       .from('tours')
-      .select('*, categories(id, name, slug), tour_itinerary(*)')
+      .select('*, categories(id, name, slug), tour_itinerary(*), tour_rates(*)')
       .eq('id', id)
       .single()
       .then(({ data: row, error: err }) => {
