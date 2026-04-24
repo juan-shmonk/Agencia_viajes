@@ -1,94 +1,98 @@
-import { CheckCircle, Mail, Calendar, Download } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { Link } from "react-router";
-import { Component } from "react";
+import { useLocation, Link } from 'react-router'
+import { CheckCircle, Mail, Calendar, Copy } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from '../components/ui/button'
 
-export class Success extends Component {
-  private bookingRef: string;
+export function Success() {
+  const location = useLocation()
+  const { reservationCode, tourTitle } = (location.state as { reservationCode?: string; tourTitle?: string }) ?? {}
+  const [copied, setCopied] = useState(false)
 
-  constructor(props: {}) {
-    super(props);
-    this.bookingRef = `TR-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+  const handleCopy = () => {
+    if (reservationCode) {
+      navigator.clipboard.writeText(reservationCode)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
-  render() {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-background px-4">
-        <div className="max-w-2xl w-full">
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center space-y-6">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-12 h-12 text-green-600" />
-            </div>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-background px-4">
+      <div className="max-w-2xl w-full">
+        <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center space-y-6">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+            <CheckCircle className="w-12 h-12 text-green-600" />
+          </div>
 
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">Booking Confirmed!</h1>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-3">¡Reserva confirmada!</h1>
+            {tourTitle && (
               <p className="text-lg text-muted-foreground">
-                Your adventure awaits! We've sent a confirmation email with all the details.
+                Tu aventura en <span className="font-semibold text-foreground">{tourTitle}</span> está lista.
               </p>
+            )}
+          </div>
+
+          {reservationCode && (
+            <div className="flex items-center justify-center gap-3 py-4 px-6 bg-primary/5 rounded-xl border border-primary/20">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Código de reserva</p>
+                <p className="font-mono font-bold text-xl text-foreground">{reservationCode}</p>
+              </div>
+              <button
+                onClick={handleCopy}
+                className="ml-2 text-muted-foreground hover:text-primary transition-colors"
+                title="Copiar código"
+              >
+                <Copy className="w-5 h-5" />
+              </button>
+              {copied && <span className="text-xs text-primary font-medium">¡Copiado!</span>}
             </div>
+          )}
 
-            <div className="bg-primary/5 rounded-xl p-6 space-y-4 text-left">
-              <div className="flex items-start gap-4">
-                <Mail className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="font-semibold mb-1">Confirmation Email Sent</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Check your inbox for booking details and payment receipt
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <Calendar className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="font-semibold mb-1">Add to Calendar</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Don't forget to mark your travel dates on your calendar
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <Download className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <h3 className="font-semibold mb-1">Download Documents</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Your travel documents and itinerary are available in your account
-                  </p>
-                </div>
+          <div className="bg-primary/5 rounded-xl p-6 space-y-4 text-left">
+            <div className="flex items-start gap-4">
+              <Mail className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-semibold mb-1">Correo de confirmación enviado</h3>
+                <p className="text-sm text-muted-foreground">
+                  Revisa tu bandeja de entrada para los detalles completos de tu reserva
+                </p>
               </div>
             </div>
 
-            <div className="pt-4 space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Booking Reference: <span className="font-mono font-semibold text-foreground">{this.bookingRef}</span>
-              </p>
+            <div className="flex items-start gap-4">
+              <Calendar className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-semibold mb-1">Agrega al calendario</h3>
+                <p className="text-sm text-muted-foreground">
+                  No olvides marcar la fecha de tu tour en tu calendario
+                </p>
+              </div>
             </div>
+          </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link to="/" className="flex-1">
-                <Button variant="outline" className="w-full">
-                  Back to Home
-                </Button>
-              </Link>
-              <Link to="/tours" className="flex-1">
-                <Button className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white">
-                  Browse More Tours
-                </Button>
-              </Link>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <Link to="/" className="flex-1">
+              <Button variant="outline" className="w-full">Volver al inicio</Button>
+            </Link>
+            <Link to="/tours" className="flex-1">
+              <Button className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white">
+                Ver más tours
+              </Button>
+            </Link>
+          </div>
 
-            <div className="pt-6 border-t">
-              <p className="text-sm text-muted-foreground">
-                Need help? Contact our support team at{" "}
-                <a href="mailto:support@tourplatform.com" className="text-primary hover:underline">
-                  support@tourplatform.com
-                </a>
-              </p>
-            </div>
+          <div className="pt-6 border-t">
+            <p className="text-sm text-muted-foreground">
+              ¿Necesitas ayuda? Escríbenos a{' '}
+              <a href="mailto:support@tourplatform.com" className="text-primary hover:underline">
+                support@tourplatform.com
+              </a>
+            </p>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  )
 }
