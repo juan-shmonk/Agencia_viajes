@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import {
-  Plus, Trash2, ArrowLeft, Upload, X, Loader2,
+  Plus, Trash2, ArrowLeft, Upload, X, Loader2, DollarSign, Clock,
 } from 'lucide-react'
 import { useTour, createTour, updateTour } from '../../../lib/hooks/useTours'
 import { useCategories } from '../../../lib/hooks/useCategories'
@@ -210,7 +210,7 @@ export function TourEditor() {
   return (
     <div className="max-w-3xl space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
         <Button
           type="button"
           variant="ghost"
@@ -224,6 +224,30 @@ export function TourEditor() {
           {isEdit ? 'Editar tour' : 'Nuevo tour'}
         </h1>
       </div>
+
+      {/* Quick links to rates and schedules (edit mode only) */}
+      {isEdit && id && (
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/admin/tours/${id}/rates`)}
+          >
+            <DollarSign size={14} className="mr-1" />
+            Tarifas
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/admin/tours/${id}/schedules`)}
+          >
+            <Clock size={14} className="mr-1" />
+            Horarios
+          </Button>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 

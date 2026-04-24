@@ -10,6 +10,8 @@ import { AdminLayout } from "./pages/admin/AdminLayout";
 import { AdminDashboard } from "./pages/admin/AdminDashboard";
 import { TourList } from "./pages/admin/TourList";
 import { TourEditor } from "./pages/admin/TourEditor";
+import { TourRates } from "./pages/admin/TourRates";
+import { TourSchedules } from "./pages/admin/TourSchedules";
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +37,8 @@ export const router = createBrowserRouter([
       { path: "tours", Component: TourList },
       { path: "tours/new", Component: TourEditor },
       { path: "tours/:id/edit", Component: TourEditor },
+      { path: "tours/:id/rates", Component: TourRates },
+      { path: "tours/:id/schedules", Component: TourSchedules },
     ],
   },
 ]);
