@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router'
-import { ArrowLeft, CreditCard, Lock, Calendar } from 'lucide-react'
+import { ArrowLeft, CreditCard, Lock, Calendar, Minus, Plus } from 'lucide-react'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -68,8 +68,25 @@ export function Checkout() {
     }
   }, [activeRates.length, selectedRateId])
 
+  // Ajustar viajeros si el cupo del horario seleccionado es menor
+  useEffect(() => {
+    if (!selectedSchedule) return
+    const seats = selectedSchedule.max_capacity - selectedSchedule.booked_count
+    if (adults + children > seats) {
+      const newAdults = Math.max(1, Math.min(adults, seats))
+      const newChildren = Math.max(0, seats - newAdults)
+      setAdults(newAdults)
+      setChildren(newChildren)
+    }
+  }, [selectedScheduleId])
+
   const selectedRate: TourRate | undefined = activeRates.find(r => r.id === selectedRateId)
   const selectedSchedule: TourSchedule | undefined = futureSchedules.find(s => s.id === selectedScheduleId)
+
+  const availableSeats = selectedSchedule
+    ? selectedSchedule.max_capacity - selectedSchedule.booked_count
+    : 20
+  const maxTravelers = Math.min(availableSeats, 20)
 
   const totalTravelers = adults + children
   const totalAmount = selectedRate ? selectedRate.price * totalTravelers : 0
@@ -272,30 +289,69 @@ export function Checkout() {
                   )}
 
                   {/* Viajeros */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="adults">Adultos</Label>
-                      <Input
-                        id="adults"
-                        type="number"
-                        min={1}
-                        max={12}
-                        value={adults}
-                        onChange={e => setAdults(Math.max(1, parseInt(e.target.value) || 1))}
-                        required
-                      />
+                  <div className="space-y-3">
+                    <Label>Viajeros</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Adultos */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">Adultos <span className="text-xs">(mín. 1)</span></p>
+                        <div className="flex items-center border rounded-lg overflow-hidden">
+                          <button
+                            type="button"
+                            aria-label="Reducir adultos"
+                            disabled={adults <= 1}
+                            onClick={() => setAdults(v => Math.max(1, v - 1))}
+                            className="flex-none w-11 h-11 flex items-center justify-center text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="flex-1 text-center font-semibold text-base tabular-nums select-none">
+                            {adults}
+                          </span>
+                          <button
+                            type="button"
+                            aria-label="Aumentar adultos"
+                            disabled={adults + children >= maxTravelers}
+                            onClick={() => setAdults(v => Math.min(maxTravelers - children, v + 1))}
+                            className="flex-none w-11 h-11 flex items-center justify-center text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                      {/* Niños */}
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">Niños <span className="text-xs">(0–17 años)</span></p>
+                        <div className="flex items-center border rounded-lg overflow-hidden">
+                          <button
+                            type="button"
+                            aria-label="Reducir niños"
+                            disabled={children <= 0}
+                            onClick={() => setChildren(v => Math.max(0, v - 1))}
+                            className="flex-none w-11 h-11 flex items-center justify-center text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="flex-1 text-center font-semibold text-base tabular-nums select-none">
+                            {children}
+                          </span>
+                          <button
+                            type="button"
+                            aria-label="Aumentar niños"
+                            disabled={adults + children >= maxTravelers}
+                            onClick={() => setChildren(v => Math.min(maxTravelers - adults, v + 1))}
+                            className="flex-none w-11 h-11 flex items-center justify-center text-muted-foreground hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="children">Niños</Label>
-                      <Input
-                        id="children"
-                        type="number"
-                        min={0}
-                        max={12}
-                        value={children}
-                        onChange={e => setChildren(Math.max(0, parseInt(e.target.value) || 0))}
-                      />
-                    </div>
+                    {selectedSchedule && (
+                      <p className="text-xs text-muted-foreground">
+                        Cupos disponibles en esta fecha: <span className="font-medium">{availableSeats}</span>
+                      </p>
+                    )}
                   </div>
 
                   {/* Pago (mock) */}
